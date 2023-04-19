@@ -1,0 +1,52 @@
+{
+  "elementos": [
+    {
+      "nombreElemento": "Inventario",
+      "nameroute": "inventario",
+      "path": "/inventario",
+      "icono": "boxes-stacked",
+      "key": "elm0",
+      "permitidoPara": ["Administrador"]
+    },
+    {
+      "nombreElemento": "Representantes Proveedores",
+      "nameroute": "rproveedores",
+      "path": "/representantes",
+      "icono": "business-time",
+      "key": "elm1",
+      "permitidoPara": ["Administrador"]
+    },
+    {
+      "nombreElemento": "Proveedores",
+      "nameroute": "proveedores",
+      "path": "/proveedores",
+      "icono": "building",
+      "key": "elm2",
+      "permitidoPara": ["Administrador", "Bodega"]
+    },
+    {
+      "nombreElemento": "Empleados",
+      "nameroute": "empleados",
+      "path": "/empleados",
+      "icono": "user-tie",
+      "key": "elm3",
+      "permitidoPara": ["Administrador"]
+    },
+    {
+      "nombreElemento": "Ordenes",
+      "nameroute": "ordenes",
+      "path": "/ordenes",
+      "icono": "clipboard-list",
+      "key": "elm4",
+      "permitidoPara": ["Administrador"]
+    },
+    {
+      "nombreElemento": "Reportes",
+      "nameroute": "reportes",
+      "path": "/reportes",
+      "icono": "file-signature",
+      "key": "elm5",
+      "permitidoPara": ["Administrador"]
+    }
+  ]
+}
