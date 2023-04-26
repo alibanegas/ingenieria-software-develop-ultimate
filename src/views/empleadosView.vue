@@ -1,3 +1,118 @@
+<script setup>
+  import { generalStore } from '@/store/index.js'
+  import { useEmpleadosStore } from '@/store/empleados'
+  import { supabase } from '@/lib/supabaseClient'
+  import { ref, watchEffect } from 'vue'
+  
+  import MenuSpace from '@/components/menu.vue'
+  import cabeceraComp from '@/components/cabecera.vue'
+  import tarjetaInventario from '@/components/tarjeta.vue'
+  import barraBusqueda from '@/components/barraBusqueda.vue'
+  import modalFiltros from '@/components/modalFiltros.vue'
+  import modalCRUD from '@/components/modalCRUD.vue'
+  import alerta from '@/components/minicomponents/alerta.vue'
+  
+  /**
+   * variable que contiene los metodos y variables de la store que retornamos (a modo de ser utilizadas como variables globales)
+   */
+  const store = generalStore()
+  const storeEmpleados = useEmpleadosStore()
+  
+  const mostrandoFiltros = ref(false)
+  const mostrandoAgregar = ref(false)
+  const mostrandoAlerta = ref(false)
+  const mensaje = ref('')
+  const err = ref(false)
+  const dataEmpleados = ref([{}])
+  const available = ref(true)
+
+  
+  const cookies = document.cookie.split(';')
+  const sucursalcode = store.desencriptarData(cookies[2].split('=')[1], 'sucursalcode')
+  
+  const dataVista = ref(JSON.parse(localStorage.getItem('usuario')))
+  
+  const encabezado = ref({
+    sucursalname: dataVista.value[0]['sucursalname'],
+    sucursalcode: sucursalcode,
+    department: dataVista.value[0]['department'],
+    colony: dataVista.value[0]['colony']
+  })
+  
+  /**
+   * Función para cambiar el valor de la bool para mostrar u ocultar el modal de los filtros
+   */
+  const mostrarModalFiltros = () => {
+    mostrandoFiltros.value = !mostrandoFiltros.value
+  }
+  
+  const usarAlerta = () => {
+    mostrandoAlerta.value = !mostrandoAlerta.value
+    setTimeout(() => { mostrandoAlerta.value = !mostrandoAlerta.value; }, 1900);
+}
+  
+  /**
+   * Función que servirá para abrir el modal con el formulario para agregar a nuevos empleados que no se encuentren registrados
+   */
+   const mostrarModalAgregarEmpleado = (alerta) => {
+    mostrandoAgregar.value = !mostrandoAgregar.value
+    if (mostrandoAgregar.value == false && alerta != '') {
+        mensaje.value = alerta[0]['mensaje']
+        err.value = alerta[0]['error']
+        usarAlerta()
+    }
+}
+  
+const cargarEmpleados= async () => {
+    try {
+        let { data, error } = await supabase
+            .rpc('mostrarempleados')
+
+        if (data != '') {
+          storeEmpleados.dataNoFiltradaEmpleados = data
+            dataEmpleados.value = storeEmpleados.dataNoFiltradaEmpleados.filter(empleado => empleado.available == available.value)
+        }
+    } catch (error) {
+        mensaje.value = error
+        err.value = true
+        usarAlerta()
+    }
+}
+cargarEmpleados()
+  
+const configurarFiltros = (availableF) => {
+    filtrar(availableF)
+}
+  
+const filtrar = (disponibilidadFiltro) => {
+    if (disponibilidadFiltro == 'true') {
+        disponibilidadFiltro = true
+    }
+    if (disponibilidadFiltro == 'false') {
+        disponibilidadFiltro = false
+    }
+    dataProveedores.value = storeProveedor.dataNoFiltradaProveedores.filter(empleado => empleado.available == disponibilidadFiltro)
+}
+
+const filtrarBusqueda = (buscar) => {
+    if (buscar == '') {
+        dataEmpleados.value = storeEmpleados.dataNoFiltradaEmpleados.filter(empleado => empleado.available == available.value)
+        store.filtradaBusqueda = false
+    } else {
+        store.filtradaBusqueda = true
+        dataEmpleados.value = dataEmpleados.value.filter(empleado => {
+            return ((empleado.name).toLowerCase()).match((buscar).toLowerCase())
+        })   
+    }
+}
+  
+  //store.dataNoFiltrada = data sin filtros (productos disponibles y no disponibles) por sucursal
+  //dataDisponibilidad = data con filtro de disponibilidad
+  //dataCategoria = data con filtro de categoria
+  //datafiltrada = data con filtro de categoria y disponibilidad (para la barra de búsqueda)
+
+  </script>
+
 <template>
     <div id="vista-inventario">
       <MenuSpace />
@@ -30,143 +145,20 @@
   
         <div class="container-fluid">
           <div class="row">
-            <tarjetaInventario v-for="producto in dataProductos" :data="producto" modulo="Empleados" />
+            <tarjetaInventario v-for="empleados in dataEmpleados" :data="empleados" modulo="Empleados" />
           </div>
         </div>
       </div>
     </div>
-    <modalFiltros v-if="mostrandoFiltros === true" @ocultar-modal="() => mostrarModalFiltros()"
-      @aplicar-filtros="(availableF, categoriaF, sucursalF) => configurarFiltros(availableF, categoriaF, sucursalF)" />
+    <modalFiltros modulo="Empleados" v-if="mostrandoFiltros === true" @ocultar-modal="() => mostrarModalFiltros()"
+      @aplicar-filtros="(availableF) => configurarFiltros(availableF)" />
     <modalCRUD v-if="mostrandoAgregar === true" modulo="Empleados" accion="Crear"
-      @ocultar-modal="() => mostrarModalAgregarEmpleado()" />
+      @ocultar-modal="(alerta) => mostrarModalAgregarEmpleado(alerta)" />
   
-    <alerta v-if="mostrandoAlerta === true" :mensaje="mensaje" error='false' />
+    <alerta v-if="mostrandoAlerta === true" :mensaje="mensaje" :error="err" />
   </template>
     
-  <script setup>
-  import { generalStore } from '@/store/index.js'
-  import { supabase } from '@/lib/supabaseClient'
-  import { ref, watchEffect } from 'vue'
   
-  import MenuSpace from '@/components/menu.vue'
-  import cabeceraComp from '@/components/cabecera.vue'
-  import tarjetaInventario from '@/components/tarjeta.vue'
-  import barraBusqueda from '@/components/barraBusqueda.vue'
-  import modalFiltros from '@/components/modalFiltros.vue'
-  import modalCRUD from '@/components/modalCRUD.vue'
-  import alerta from '@/components/minicomponents/alerta.vue'
-  
-  /**
-   * variable que contiene los metodos y variables de la store que retornamos (a modo de ser utilizadas como variables globales)
-   */
-  const store = generalStore()
-  
-  const mostrandoFiltros = ref(false)
-  const mostrandoAgregar = ref(false)
-  const mostrandoAlerta = ref(false)
-  const mensaje = ref('')
-  const dataProductos = ref([{}])
-  const available = ref(true)
-  const filtradaDisponibildad = ref(false)
-  const filtradaCategoria = ref(false)
-  const dataDisponibilidad = ref([{}])
-  const dataCategoria = ref([{}])
-  const dataFiltrada = ref([{}])
-  
-  const cookies = document.cookie.split(';')
-  const sucursalcode = store.desencriptarData(cookies[2].split('=')[1], 'sucursalcode')
-  
-  const dataVista = ref(JSON.parse(localStorage.getItem('usuario')))
-  
-  const encabezado = ref({
-    sucursalname: dataVista.value[0]['sucursalname'],
-    sucursalcode: sucursalcode,
-    department: dataVista.value[0]['department'],
-    colony: dataVista.value[0]['colony']
-  })
-  
-  /**
-   * Función para cambiar el valor de la bool para mostrar u ocultar el modal de los filtros
-   */
-  const mostrarModalFiltros = () => {
-    mostrandoFiltros.value = !mostrandoFiltros.value
-  }
-  
-  
-  /**
-   * Función que servirá para abrir el modal con el formulario para agregar a nuevos empleados que no se encuentren registrados
-   */
-  const mostrarModalAgregarEmpleado = () => {
-    mostrandoAgregar.value = !mostrandoAgregar.value
-  }
-  
-  const cargarProductos = async () => {
-    try {
-      let { data, error } = await supabase
-        .rpc('mostrarproductos', {
-          sucursalcode: sucursalcode
-        })
-  
-      if (error) console.error(error)
-  
-      if (data != '') {
-        store.dataNoFiltrada = data
-        dataProductos.value = store.dataNoFiltrada.filter(producto => producto.available == available.value)
-      }
-  
-    } catch (error) {
-      alert(error)
-    }
-  }
-  cargarProductos()
-  
-  
-  const configurarFiltros = (availableF, categoriaF, sucursalF) => {
-    if (sucursalF != '') {
-      //cargarProductos(sucursalF)
-    }
-    filtrarDisponibilidad(availableF, categoriaF)
-    //filtrarCategoria(categoriaF)
-  }
-  
-  const filtrarDisponibilidad = (disponibilidadFiltro, categoriaFiltro) => {
-    if(disponibilidadFiltro === 'true'){
-      disponibilidadFiltro = true
-    }
-    if(disponibilidadFiltro === 'false'){
-      disponibilidadFiltro = false
-    }
-  
-    if(categoriaFiltro != ''){
-      filtradaCategoria.value = true
-    }else{
-      filtradaCategoria.value = false
-    }
-    console.log(categoriaFiltro)
-  
-    if (disponibilidadFiltro == available.value && filtradaCategoria.value == false) {
-      dataProductos.value = dataProductos.value
-    } else {
-      dataProductos.value = store.dataNoFiltrada.filter(producto => {
-        available.value = !available.value
-        filtradaDisponibildad.value = true
-        if(filtradaCategoria.value == false){
-          return producto.available == disponibilidadFiltro
-        }else{
-          return producto.available == disponibilidadFiltro && producto.categorycode == categoriaFiltro
-        }
-      })
-    }
-  }
-  
-  //store.dataNoFiltrada = data sin filtros (productos disponibles y no disponibles) por sucursal
-  //dataDisponibilidad = data con filtro de disponibilidad
-  //dataCategoria = data con filtro de categoria
-  //datafiltrada = data con filtro de categoria y disponibilidad (para la barra de búsqueda)
-  
-  
-  
-  </script>
   
   <style scoped>
   #vista-inventario .cuerpo-vista {

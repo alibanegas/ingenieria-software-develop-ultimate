@@ -1,29 +1,24 @@
 <template>
     <div class="data">
-        <p class="data-text">{{ dataProducto['productdescription'] }}</p>
+        <p class="data-text">{{ dataEmpleados['firstname' + 'paternalsurname'] }}</p>
         <div class="d-flex">
-            <span class="data-modal"> Código: {{ dataProducto['productcode'] }}</span>
-            <span class="data-modal"> Proveedor: {{ dataProducto['vendorname'] }}</span>
+            <span class="data-modal"> Correo Electrónico: {{ dataEmpleados['email'] }}</span>
+            <span class="data-modal"> Número Telefono: {{ dataEmpleados['telephonenumber'] }}</span>
         </div>
         <div class="d-flex">
-            <span class="data-modal"> Categoría: {{ dataProducto['categoryname'] }}</span>
-            <span class="data-modal"> Lote: {{ dataProducto['lotnumber'] }} </span>
+            <span class="data-modal"> Fecha Contratación: {{ dataEmpleados['hiredate'] }}</span>
         </div>
         <div class="d-flex">
-            <span class="data-modal"> Precio: {{dataProducto['purchaseprice']}} </span>
-            <span class="data-modal"> Expira: {{ dataProducto['expirationdate'] }} </span>
-        </div>
-        <div class="d-flex">
-            <span class="data-modal"> {{ dataProducto['units'] }}/caja</span>
-            <span class="data-modal"> Stock: {{ dataProducto['stock'] }} Unidades </span>
+            <span class="data-modal"> Puesto de Trabajo: {{dataEmpleados['jobname']}} </span>
+            <span class="data-modal"> Sueldo: {{ dataEmpleados['agreedsalary'] }} </span>
         </div>
     </div>
 </template>
 
 
 <script setup>
-const propsProductoModal = defineProps([
-    'dataProducto'
+const propsEmpleadosModal = defineProps([
+    'dataEmpleados'
 ])
 </script>
 

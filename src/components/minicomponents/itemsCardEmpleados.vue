@@ -1,15 +1,18 @@
 <template>
+    <!-- Tarjeta presentación de cada empleado -->
+
     <div class="items-card">
         <div class="d-flex">
-            <span class="item-card"> {{ dataProducto['categoryname'] }} </span>
+            <span class="item-card"> {{ dataEmpleados['jobname'] }} </span>
         </div>
-        <p class="card-text"> {{ dataProducto['productdescription'] }} </p>
+        <p class="card-text"> {{ dataEmpleados['hiredate'] }} </p>
+        <p class="card-text"> {{ dataEmpleados['agreedsalary'] }} </p>
     </div>
 </template>
 
 <script setup>
-const propsProducto = defineProps([
-    'dataProducto'
+const propsEmpleados = defineProps([
+    'dataEmpleados'
 ])
 </script>
 

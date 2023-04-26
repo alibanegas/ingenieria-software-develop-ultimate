@@ -1,13 +1,13 @@
 <template>
     <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: block;">
-        <div class="modal-dialog-centered modal-sm modal-dialog">
+        <div  class="modal-dialog-centered modal-sm modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
                     <div v-if="modulo === 'Inventario'" class="formulario">
                         <formularioProductos ref="guardar" :data=data :accion=accion />
                     </div>
-                    <div v-if="modulo === 'Empleados'" class="formulario">
+                    <div v-if="modulo === 'Empleados'" class="formulario ">
                         <formularioACEmpleado ref="guardar" :data=data :accion=accion />
                     </div>
                 </div>

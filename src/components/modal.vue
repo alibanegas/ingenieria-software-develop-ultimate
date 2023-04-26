@@ -12,8 +12,8 @@
                 <div class="modal-body">
                     <dataModalProducto v-if="modulo === 'Inventario'" :dataProducto="data" />
                 </div>
-                <div class="modal-body">
-                    <dataModalEmpleados v-if="modulo === 'Empleados'" :dataProducto="data" />
+                <div class="modal-body ">
+                    <dataModalEmpleados v-if="modulo === 'Empleados'" :dataEmpleados="data" />
                 </div>
                 <div class="modal-footer">
                     <div class="botones izquierda">

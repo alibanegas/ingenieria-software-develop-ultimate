@@ -10,7 +10,7 @@
                     <span>{{ data['name'] }}</span>
                 </div>
                 <miniItemsProducto v-if="modulo === 'Inventario'" :dataProducto="data" />
-                <ItemsCardEmpleados v-if="modulo === 'Empleados'" :dataProducto="data" />
+                <ItemsCardEmpleados v-if="modulo === 'Empleados'" :dataEmpleados="data" />
             </div>
         </div>
     </div>
